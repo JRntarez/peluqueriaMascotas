@@ -1,9 +1,12 @@
 package com.mycompany.peluqueriacanina.igu;
 
+import javax.swing.JFrame;
+
 public class Principal extends javax.swing.JFrame {
     
     public Principal() {
         initComponents();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     @SuppressWarnings("unchecked")
@@ -122,10 +125,11 @@ public class Principal extends javax.swing.JFrame {
         CargarDatos carga = new CargarDatos();
         carga.setVisible(true);
         carga.setLocationRelativeTo(null);
+        
     }//GEN-LAST:event_btnCargarDatosActionPerformed
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
-        // TODO add your handling code here:
+        this.dispose();
     }//GEN-LAST:event_btnSalirActionPerformed
 
     private void btnVerDatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerDatosActionPerformed

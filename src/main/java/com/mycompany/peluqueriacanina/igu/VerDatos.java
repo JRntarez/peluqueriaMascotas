@@ -3,6 +3,9 @@ package com.mycompany.peluqueriacanina.igu;
 import com.mycompany.peluqueriacanina.logica.Controladora;
 import com.mycompany.peluqueriacanina.logica.Mascota;
 import java.util.List;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class VerDatos extends javax.swing.JFrame {
@@ -14,6 +17,7 @@ public class VerDatos extends javax.swing.JFrame {
     public VerDatos() {
         control = new Controladora();
         initComponents();
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     /**
@@ -29,7 +33,7 @@ public class VerDatos extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tablaMascotas = new javax.swing.JTable();
         btnEliminar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
@@ -46,7 +50,7 @@ public class VerDatos extends javax.swing.JFrame {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tablaMascotas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
                 {},
@@ -57,13 +61,23 @@ public class VerDatos extends javax.swing.JFrame {
 
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tablaMascotas);
 
         btnEliminar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
 
         btnEditar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel2.setText("Datos de mascotas: ");
@@ -147,6 +161,57 @@ public class VerDatos extends javax.swing.JFrame {
         cargarTabla();
     }//GEN-LAST:event_formWindowOpened
 
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        //Control de que la tabla no este vacia, ya que saltaran errores
+        if(tablaMascotas.getRowCount() > 0){
+            
+            //Control para seleccion. Mientras la celda seleccionada sea diferente de -1, entonces habra un registro existente a seleccionar
+            if(tablaMascotas.getSelectedRow() != -1){
+                int num_cliente = Integer.parseInt(String.valueOf(tablaMascotas.getValueAt(tablaMascotas.getSelectedRow(), 0)));
+                control.borrarMascota(num_cliente);
+            
+            mostrarMensaje("Mascota eliminada correctamente", "Info", "Borrado de mascota");
+            cargarTabla();
+            }
+            else{
+                mostrarMensaje("No selecciono ninguna mascota", "Error", "Error al eliminar");
+            }
+        }else{
+            mostrarMensaje("No hay datos para eliminar en la tabla", "Error", "Error al eliminar");
+        }
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        if(tablaMascotas.getRowCount() > 0){
+            if(tablaMascotas.getSelectedRow() != -1){
+                int num_cliente = Integer.parseInt(String.valueOf(tablaMascotas.getValueAt(tablaMascotas.getSelectedRow(), 0)));
+                ModificarDatos pantalla = new ModificarDatos(num_cliente);
+                pantalla.setVisible(true);
+                pantalla.setLocationRelativeTo(null);
+                
+                this.dispose();
+
+            }
+            else{
+                mostrarMensaje("No selecciono ninguna mascota", "Error", "Error al editar");
+            }
+        }else{
+            mostrarMensaje("No hay datos para editar en la tabla", "Error", "Error al editar");
+        }
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    
+    public void mostrarMensaje(String mensaje, String tipo, String titulo){
+        JOptionPane optionPane = new JOptionPane(mensaje);
+        if(tipo.equals("Info")){
+            optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
+        }else if(tipo.equals("Error")){
+            optionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
+        }
+        JDialog dialog = optionPane.createDialog(titulo);
+        dialog.setAlwaysOnTop(true);
+        dialog.setVisible(true);
+    }
     /**
      * @param args the command line arguments
      */
@@ -160,13 +225,14 @@ public class VerDatos extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tablaMascotas;
     // End of variables declaration//GEN-END:variables
 
     private void cargarTabla() {
         //se define el modelo de la tabla
-        DefaultTableModel tabla = new DefaultTableModel(){
+        DefaultTableModel Modelotabla = new DefaultTableModel(){
             //Para que filas y columnas no sean editables al elegir o seleccionar una celda. La unica forma de editar es por medio del boton
+            @Override
             public boolean isCellEditable (int row, int column){
                 return false;
             }
@@ -174,7 +240,7 @@ public class VerDatos extends javax.swing.JFrame {
         
         //Establecer forma de columna:
         String titulos[] = {"Num", "Nombre", "Color", "Raza", "Alergico", "At.Especial", "Dueño", "Cel"};
-        tabla.setColumnIdentifiers(titulos);
+        Modelotabla.setColumnIdentifiers(titulos);
         
         //Carga de datos de la base de datos
         List <Mascota> listaMascotas = control.traerMascotas();
@@ -183,8 +249,9 @@ public class VerDatos extends javax.swing.JFrame {
         if(listaMascotas != null){
             for(Mascota masco:listaMascotas){
                 Object[] objeto = {masco.getNum_Cliente(), masco.getNombre(), masco.getColor(), masco.getRaza(), masco.getAlergico(), masco.getAtencion_especial(), masco.getUnDuenio().getNombre(), masco.getUnDuenio().getCelular()};
-                tabla.addRow(objeto);
+                Modelotabla.addRow(objeto);
             }
         }
+        tablaMascotas.setModel(Modelotabla);
     }
 }
